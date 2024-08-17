@@ -1,0 +1,10 @@
+[tool.poetry]
+name = "claude-engineer"
+version = "0.0.0"
+description = "interactive CLI that leverages the power of Anthropic's Claude-3.5-Sonnet model to assist with software development tasks"
+authors = ["Doriandarko"]
+readme = "readme.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
