@@ -22,7 +22,7 @@ from prompt_toolkit.styles import Style
 async def get_user_input(prompt="You: "):
     style = Style.from_dict(
         {
-            'prompt': 'cyan bold',
+            "prompt": "cyan bold",
         }
     )
     session = PromptSession(style=style)
@@ -77,10 +77,10 @@ console = Console()
 
 
 # Token tracking variables
-main_model_tokens = {'input': 0, 'output': 0}
-tool_checker_tokens = {'input': 0, 'output': 0}
-code_editor_tokens = {'input': 0, 'output': 0}
-code_execution_tokens = {'input': 0, 'output': 0}
+main_model_tokens = {"input": 0, "output": 0}
+tool_checker_tokens = {"input": 0, "output": 0}
+code_editor_tokens = {"input": 0, "output": 0}
+code_execution_tokens = {"input": 0, "output": 0}
 
 # Set up the conversation memory (maintains context for MAINMODEL)
 conversation_history = []
@@ -261,7 +261,7 @@ def create_folder(path):
 def create_file(path, content=""):
     global file_contents
     try:
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             f.write(content)
         file_contents[path] = content
         return f"File created and added to system prompt: {path}"
@@ -350,8 +350,8 @@ async def generate_edit_instructions(
             ],
         )
         # Update token usage for code editor
-        code_editor_tokens['input'] += response.usage.input_tokens
-        code_editor_tokens['output'] += response.usage.output_tokens
+        code_editor_tokens["input"] += response.usage.input_tokens
+        code_editor_tokens["output"] += response.usage.output_tokens
 
         # Parse the response to extract SEARCH/REPLACE blocks
         edit_instructions = parse_search_replace_blocks(response.content[0].text)
@@ -375,11 +375,11 @@ async def generate_edit_instructions(
 
 def parse_search_replace_blocks(response_text):
     blocks = []
-    pattern = r'<SEARCH>\n(.*?)\n</SEARCH>\n<REPLACE>\n(.*?)\n</REPLACE>'
+    pattern = r"<SEARCH>\n(.*?)\n</SEARCH>\n<REPLACE>\n(.*?)\n</REPLACE>"
     matches = re.findall(pattern, response_text, re.DOTALL)
 
     for search, replace in matches:
-        blocks.append({'search': search.strip(), 'replace': replace.strip()})
+        blocks.append({"search": search.strip(), "replace": replace.strip()})
 
     return json.dumps(blocks)  # Keep returning JSON string
 
@@ -391,7 +391,7 @@ async def edit_and_apply(
     try:
         original_content = file_contents.get(path, "")
         if not original_content:
-            with open(path, 'r') as file:
+            with open(path, "r") as file:
                 original_content = file.read()
             file_contents[path] = original_content
 
@@ -480,8 +480,8 @@ async def apply_edits(file_path, edit_instructions, original_content):
         edit_task = progress.add_task("[cyan]Applying edits...", total=total_edits)
 
         for i, edit in enumerate(edit_instructions, 1):
-            search_content = edit['search'].strip()
-            replace_content = edit['replace'].strip()
+            search_content = edit["search"].strip()
+            replace_content = edit["replace"].strip()
 
             # Use regex to find the content, ignoring leading/trailing whitespace
             pattern = re.compile(re.escape(search_content), re.DOTALL)
@@ -492,7 +492,7 @@ async def apply_edits(file_path, edit_instructions, original_content):
                 start, end = match.span()
                 # Strip <SEARCH> and <REPLACE> tags from replace_content
                 replace_content_cleaned = re.sub(
-                    r'</?SEARCH>|</?REPLACE>', '', replace_content
+                    r"</?SEARCH>|</?REPLACE>", "", replace_content
                 )
                 edited_content = (
                     edited_content[:start]
@@ -530,7 +530,7 @@ async def apply_edits(file_path, edit_instructions, original_content):
         )
     else:
         # Write the changes to the file
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             file.write(edited_content)
         console.print(Panel(f"Changes have been written to {file_path}", style="green"))
 
@@ -548,7 +548,7 @@ def generate_diff(original, new, path):
         )
     )
 
-    diff_text = ''.join(diff)
+    diff_text = "".join(diff)
     highlighted_diff = highlight_diff(diff_text)
 
     return highlighted_diff
@@ -602,7 +602,7 @@ async def execute_code(code, timeout=10):
 def read_file(path):
     global file_contents
     try:
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             content = f.read()
         file_contents[path] = content
         return f"File '{path}' has been read and stored in the system prompt."
@@ -615,7 +615,7 @@ def read_multiple_files(paths):
     results = []
     for path in paths:
         try:
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 content = f.read()
             file_contents[path] = content
             results.append(
@@ -859,11 +859,11 @@ def encode_image_to_base64(image_path):
         with Image.open(image_path) as img:
             max_size = (1024, 1024)
             img.thumbnail(max_size, Image.DEFAULT_STRATEGY)
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
+            if img.mode != "RGB":
+                img = img.convert("RGB")
             img_byte_arr = io.BytesIO()
-            img.save(img_byte_arr, format='JPEG')
-            return base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
+            img.save(img_byte_arr, format="JPEG")
+            return base64.b64encode(img_byte_arr.getvalue()).decode("utf-8")
     except Exception as e:
         return f"Error encoding image: {str(e)}"
 
@@ -906,8 +906,8 @@ async def send_to_ai_for_executing(code, execution_result):
         )
 
         # Update token usage for code execution
-        code_execution_tokens['input'] += response.usage.input_tokens
-        code_execution_tokens['output'] += response.usage.output_tokens
+        code_execution_tokens["input"] += response.usage.input_tokens
+        code_execution_tokens["output"] += response.usage.output_tokens
 
         analysis = response.content[0].text
 
@@ -928,26 +928,26 @@ def save_chat():
     # Format conversation history
     formatted_chat = "# Claude-3-Sonnet Engineer Chat Log\n\n"
     for message in conversation_history:
-        if message['role'] == 'user':
+        if message["role"] == "user":
             formatted_chat += f"## User\n\n{message['content']}\n\n"
-        elif message['role'] == 'assistant':
-            if isinstance(message['content'], str):
+        elif message["role"] == "assistant":
+            if isinstance(message["content"], str):
                 formatted_chat += f"## Claude\n\n{message['content']}\n\n"
-            elif isinstance(message['content'], list):
-                for content in message['content']:
-                    if content['type'] == 'tool_use':
+            elif isinstance(message["content"], list):
+                for content in message["content"]:
+                    if content["type"] == "tool_use":
                         formatted_chat += f"### Tool Use: {content['name']}\n\n```json\n{json.dumps(content['input'], indent=2)}\n```\n\n"
-                    elif content['type'] == 'text':
+                    elif content["type"] == "text":
                         formatted_chat += f"## Claude\n\n{content['text']}\n\n"
-        elif message['role'] == 'user' and isinstance(message['content'], list):
-            for content in message['content']:
-                if content['type'] == 'tool_result':
+        elif message["role"] == "user" and isinstance(message["content"], list):
+            for content in message["content"]:
+                if content["type"] == "tool_result":
                     formatted_chat += (
                         f"### Tool Result\n\n```\n{content['content']}\n```\n\n"
                     )
 
     # Save to file
-    with open(filename, 'w', encoding='utf-8') as f:
+    with open(filename, "w", encoding="utf-8") as f:
         f.write(formatted_chat)
 
     return filename
@@ -1015,15 +1015,15 @@ async def chat_with_claude(
     # Filter conversation history to maintain context
     filtered_conversation_history = []
     for message in conversation_history:
-        if isinstance(message['content'], list):
+        if isinstance(message["content"], list):
             filtered_content = [
                 content
-                for content in message['content']
-                if content.get('type') != 'tool_result'
+                for content in message["content"]
+                if content.get("type") != "tool_result"
                 or (
-                    content.get('type') == 'tool_result'
+                    content.get("type") == "tool_result"
                     and not any(
-                        keyword in content.get('output', '')
+                        keyword in content.get("output", "")
                         for keyword in [
                             "File contents updated in system prompt",
                             "File created and added to system prompt",
@@ -1034,7 +1034,7 @@ async def chat_with_claude(
             ]
             if filtered_content:
                 filtered_conversation_history.append(
-                    {**message, 'content': filtered_content}
+                    {**message, "content": filtered_content}
                 )
         else:
             filtered_conversation_history.append(message)
@@ -1054,8 +1054,8 @@ async def chat_with_claude(
             tool_choice={"type": "auto"},
         )
         # Update token usage for MAINMODEL
-        main_model_tokens['input'] += response.usage.input_tokens
-        main_model_tokens['output'] += response.usage.output_tokens
+        main_model_tokens["input"] += response.usage.input_tokens
+        main_model_tokens["output"] += response.usage.output_tokens
     except APIStatusError as e:
         if e.status_code == 429:
             console.print(
@@ -1183,11 +1183,11 @@ async def chat_with_claude(
 
         # Update the file_contents dictionary if applicable
         if (
-            tool_name in ['create_file', 'edit_and_apply', 'read_file']
+            tool_name in ["create_file", "edit_and_apply", "read_file"]
             and not tool_result["is_error"]
         ):
-            if 'path' in tool_input:
-                file_path = tool_input['path']
+            if "path" in tool_input:
+                file_path = tool_input["path"]
                 if (
                     "File contents updated in system prompt" in tool_result["content"]
                     or "File created and added to system prompt"
@@ -1211,8 +1211,8 @@ async def chat_with_claude(
                 tool_choice={"type": "auto"},
             )
             # Update token usage for tool checker
-            tool_checker_tokens['input'] += tool_response.usage.input_tokens
-            tool_checker_tokens['output'] += tool_response.usage.output_tokens
+            tool_checker_tokens["input"] += tool_response.usage.input_tokens
+            tool_checker_tokens["output"] += tool_response.usage.output_tokens
 
             tool_checker_response = ""
             for tool_content_block in tool_response.content:
@@ -1259,10 +1259,10 @@ def reset_code_editor_memory():
 def reset_conversation():
     global conversation_history, main_model_tokens, tool_checker_tokens, code_editor_tokens, code_execution_tokens, file_contents, code_editor_files
     conversation_history = []
-    main_model_tokens = {'input': 0, 'output': 0}
-    tool_checker_tokens = {'input': 0, 'output': 0}
-    code_editor_tokens = {'input': 0, 'output': 0}
-    code_execution_tokens = {'input': 0, 'output': 0}
+    main_model_tokens = {"input": 0, "output": 0}
+    tool_checker_tokens = {"input": 0, "output": 0}
+    code_editor_tokens = {"input": 0, "output": 0}
+    code_execution_tokens = {"input": 0, "output": 0}
     file_contents = {}
     code_editor_files = set()
     reset_code_editor_memory()
@@ -1307,8 +1307,8 @@ def display_token_usage():
         ("Code Editor", code_editor_tokens),
         ("Code Execution", code_execution_tokens),
     ]:
-        input_tokens = tokens['input']
-        output_tokens = tokens['output']
+        input_tokens = tokens["input"]
+        output_tokens = tokens["output"]
         total_tokens = input_tokens + output_tokens
 
         total_input += input_tokens
@@ -1377,7 +1377,7 @@ async def main():
     while True:
         user_input = await get_user_input()
 
-        if user_input.lower() == 'exit':
+        if user_input.lower() == "exit":
             console.print(
                 Panel(
                     "Thank you for chatting. Goodbye!",
@@ -1388,11 +1388,11 @@ async def main():
             )
             break
 
-        if user_input.lower() == 'reset':
+        if user_input.lower() == "reset":
             reset_conversation()
             continue
 
-        if user_input.lower() == 'save chat':
+        if user_input.lower() == "save chat":
             filename = save_chat()
             console.print(
                 Panel(
@@ -1401,7 +1401,7 @@ async def main():
             )
             continue
 
-        if user_input.lower() == 'image':
+        if user_input.lower() == "image":
             image_path = (
                 (
                     await get_user_input(
@@ -1424,7 +1424,7 @@ async def main():
                     )
                 )
                 continue
-        elif user_input.lower().startswith('automode'):
+        elif user_input.lower().startswith("automode"):
             try:
                 parts = user_input.split()
                 if len(parts) > 1 and parts[1].isdigit():
