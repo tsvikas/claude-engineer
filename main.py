@@ -20,11 +20,7 @@ from prompt_toolkit.styles import Style
 
 
 async def get_user_input(prompt="You: "):
-    style = Style.from_dict(
-        {
-            "prompt": "cyan bold",
-        }
-    )
+    style = Style.from_dict({"prompt": "cyan bold"})
     session = PromptSession(style=style)
     return await session.prompt_async(prompt, multiline=False)
 
